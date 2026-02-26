@@ -146,7 +146,7 @@ export const Instructions: React.FC = () => {
           During your call, Matteo will{" "}
           <strong className="text-white">pause and coach you</strong> whenever
           you breach Italian business etiquette — from rushed introductions to
-          skipping the <em>bella figura</em>.
+          skipping the the art of making a good impression.
         </p>
         <Button
           onClick={handleClick}
