@@ -21,9 +21,7 @@ const AudioButton: React.FC<AudioButtonProps> = ({
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       audio.currentTime = 0;
-      audio.play().catch((error) => {
-        console.warn("Audio playback failed:", error);
-      });
+      audio.play().catch(() => {});
 
       onClick?.(event);
     },

@@ -189,7 +189,6 @@ export const Game: React.FC = memo(() => {
         if (ev.data?.event_type === "conversation.tool_call") {
           const score = ev.data?.properties?.arguments?.score ?? 0;
           const scorePoint = getScorePoint(score);
-          console.log({ score, scorePoint });
 
           if (score > 0) {
             if (scorePoint > niceScore) {
@@ -197,17 +196,13 @@ export const Game: React.FC = memo(() => {
               setTimeout(() => {
                 setShowNice(false);
               }, 2000);
-              audioNice.play().catch((error) => {
-                console.warn("Audio playback failed:", error);
-              });
+              audioNice.play().catch(() => {});
               setNiceScore(scorePoint);
             }
           } else if (score < 0) {
             if (scorePoint !== naughtyScore) {
               setShowNaughty(true);
-              audioNaughty.play().catch((error) => {
-                console.warn("Audio playback failed:", error);
-              });
+              audioNaughty.play().catch(() => {});
               setTimeout(() => {
                 setShowNaughty(false);
               }, 2000);
