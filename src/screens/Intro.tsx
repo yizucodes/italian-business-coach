@@ -2,7 +2,6 @@ import { AnimatedWrapper } from "@/components/DialogWrapper";
 import React from "react";
 import { useAtom } from "jotai";
 import { screenAtom } from "@/store/screens";
-import { Unlock } from "lucide-react";
 import AudioButton from "@/components/AudioButton";
 import { apiTokenAtom } from "@/store/tokens";
 import { Input } from "@/components/ui/input";
@@ -16,6 +15,12 @@ export const Intro: React.FC = () => {
     setScreenState({ currentScreen: "instructions" });
   };
 
+  const handleTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newToken = e.target.value;
+    setToken(newToken);
+    localStorage.setItem("tavus-token", newToken);
+  };
+
   return (
     <AnimatedWrapper>
       <div className="flex size-full flex-col items-center justify-center">
@@ -27,65 +32,124 @@ export const Intro: React.FC = () => {
           playsInline
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-primary-overlay backdrop-blur-sm" />
-        <div className="relative z-10 flex flex-col items-center gap-2 py-4 px-4 rounded-xl border border-[rgba(255,255,255,0.2)]" 
-          style={{ 
-            fontFamily: 'Inter, sans-serif',
-            background: 'rgba(0,0,0,0.3)'
-          }}>
-          <img src="/public/images/vector.svg" alt="Logo" className="mt-2 mb-1" style={{ width: '40px', height: 'auto' }} />
+        {/* Warm Italian overlay */}
+        <div
+          className="absolute inset-0 backdrop-blur-sm"
+          style={{ background: "rgba(8, 5, 2, 0.62)" }}
+        />
 
-          <h1 className="text-xl font-bold text-white mb-1" style={{ fontFamily: 'Source Code Pro, monospace' }}>CVI Demo Playground</h1>
-
-          <div className="flex flex-col gap-2 items-center mt-4">
-            <Input
-              type="password"
-              value={token || ""}
-              onChange={(e) => {
-                const newToken = e.target.value;
-                setToken(newToken);
-                localStorage.setItem('tavus-token', newToken);
-              }}
-              placeholder="Enter Tavus API Key"
-              className="w-64 bg-[rgba(255,255,255,0.1)] text-white rounded-3xl border border-[rgba(255,255,255,0.3)] px-4 py-3 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary"
-              style={{ 
-                color: 'white', 
-                fontFamily: 'Source Code Pro, monospace',
-              }}
-            />
-
-            <p className="text-sm text-white transition-all duration-200">
-              Don't have a key?{" "}
-              <a
-                href="https://platform.tavus.io/api-keys"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-primary"
-              >
-                Create an account.
-              </a>
-            </p>
+        <div
+          className="relative z-10 flex flex-col items-center w-full max-w-sm rounded-2xl border border-white/15 overflow-hidden"
+          style={{ background: "rgba(10, 7, 4, 0.80)" }}
+        >
+          {/* Italian tricolore stripe */}
+          <div className="flex w-full h-1.5">
+            <div className="flex-1" style={{ background: "#008C45" }} />
+            <div className="flex-1" style={{ background: "#F4F5F0" }} />
+            <div className="flex-1" style={{ background: "#CD212A" }} />
           </div>
 
-          <AudioButton 
-            onClick={handleClick}
-            className="relative z-20 flex items-center justify-center gap-2 rounded-3xl border border-[rgba(255,255,255,0.3)] px-4 py-2 text-sm text-white transition-all duration-200 hover:text-primary mt-4 disabled:opacity-50"
-            disabled={!token}
-            style={{
-              height: '44px',
-              transition: 'all 0.2s ease-in-out',
-              backgroundColor: 'rgba(0,0,0,0.3)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 15px rgba(34, 197, 254, 0.5)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
-            <Unlock className="size-4" />
-            Unlock Demo
-          </AudioButton>
+          <div className="flex flex-col items-center gap-4 px-7 pt-5 pb-6 w-full">
+            {/* Brand row */}
+            <div className="flex items-center gap-2">
+              <span className="text-2xl" role="img" aria-label="Italian flag">
+                🇮🇹
+              </span>
+              <span
+                className="text-xs font-bold tracking-[0.18em] uppercase"
+                style={{
+                  color: "#CD212A",
+                  fontFamily: "Source Code Pro, monospace",
+                }}
+              >
+                Benvenuto
+              </span>
+            </div>
+
+            <h1
+              className="text-[1.15rem] font-bold text-white text-center leading-snug"
+              style={{ fontFamily: "Source Code Pro, monospace" }}
+            >
+              Italian Business Coach
+            </h1>
+
+            {/* Scenario card */}
+            <div
+              className="w-full rounded-xl border border-white/10 px-4 py-3 text-sm text-gray-300 leading-relaxed"
+              style={{ background: "rgba(255,255,255,0.04)" }}
+            >
+              <p>
+                You're an{" "}
+                <strong className="text-white">American sales executive</strong>{" "}
+                about to meet{" "}
+                <strong className="text-white">Matteo Rossi</strong> in Milan —
+                VP of Procurement at a major Italian manufacturing firm.
+              </p>
+              <p className="mt-2" style={{ color: "#8FD8A8" }}>
+                Your goal: close a partnership deal while navigating Italian
+                business culture.
+              </p>
+            </div>
+
+            {/* API key input */}
+            <div className="flex flex-col gap-1.5 items-center w-full">
+              <Input
+                type="password"
+                value={token || ""}
+                onChange={handleTokenChange}
+                placeholder="Tavus API Key"
+                className="w-full rounded-xl border border-white/20 px-4 py-2.5 text-sm text-white bg-white/8 transition-all focus:outline-none focus:ring-2 focus:border-transparent"
+                style={{
+                  fontFamily: "Source Code Pro, monospace",
+                  color: "white",
+                  background: "rgba(255,255,255,0.06)",
+                  // ring colour handled via CSS variable override below
+                }}
+              />
+              <p className="text-xs text-gray-500">
+                No key?{" "}
+                <a
+                  href="https://platform.tavus.io/api-keys"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline transition-colors hover:text-white"
+                  style={{ color: "#8FD8A8" }}
+                >
+                  Create a free account
+                </a>
+              </p>
+            </div>
+
+            {/* CTA */}
+            <AudioButton
+              onClick={handleClick}
+              disabled={!token}
+              className="relative z-20 flex items-center justify-center gap-2 rounded-xl border px-6 text-sm font-semibold text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed w-full"
+              style={{
+                height: "44px",
+                backgroundColor: token ? "#008C45" : "rgba(0,140,69,0.25)",
+                borderColor: token ? "#008C45" : "rgba(255,255,255,0.15)",
+                boxShadow: token
+                  ? "0 0 20px rgba(0,140,69,0.35)"
+                  : "none",
+                transition: "all 0.2s ease-in-out",
+              }}
+              onMouseEnter={(e) => {
+                if (!token) return;
+                e.currentTarget.style.boxShadow =
+                  "0 0 28px rgba(0,140,69,0.6)";
+                e.currentTarget.style.backgroundColor = "#009e4f";
+              }}
+              onMouseLeave={(e) => {
+                if (!token) return;
+                e.currentTarget.style.boxShadow =
+                  "0 0 20px rgba(0,140,69,0.35)";
+                e.currentTarget.style.backgroundColor = "#008C45";
+              }}
+            >
+              Connect to Matteo →
+            </AudioButton>
+          </div>
         </div>
       </div>
     </AnimatedWrapper>

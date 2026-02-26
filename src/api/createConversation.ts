@@ -2,34 +2,37 @@ import { IConversation } from "@/types";
 import { settingsAtom } from "@/store/settings";
 import { getDefaultStore } from "jotai";
 
+const FALLBACK_PERSONA_ID =
+  import.meta.env.VITE_PERSONA_ID ?? "pd43ffef";
+
+const MATTEO_GREETING =
+  "Benvenuto. I'm Matteo Rossi. Please, take a seat — let's talk business.";
+
 export const createConversation = async (
   token: string,
 ): Promise<IConversation> => {
-  // Get settings from Jotai store
   const settings = getDefaultStore().get(settingsAtom);
-  
-  // Add debug logs
-  console.log('Creating conversation with settings:', settings);
-  console.log('Greeting value:', settings.greeting);
-  console.log('Context value:', settings.context);
-  
-  // Build the context string
+
+  if (import.meta.env.DEV) {
+    console.log("[dev] createConversation settings:", settings);
+  }
+
   let contextString = "";
   if (settings.name) {
     contextString = `You are talking with the user, ${settings.name}. Additional context: `;
   }
   contextString += settings.context || "";
-  
+
   const payload = {
-    persona_id: settings.persona || "pd43ffef",
-    custom_greeting: settings.greeting !== undefined && settings.greeting !== null 
-      ? settings.greeting 
-      : "Hey there! I'm your technical co-pilot! Let's get get started building with Tavus.",
-    conversational_context: contextString
+    persona_id: settings.persona || FALLBACK_PERSONA_ID,
+    custom_greeting: settings.greeting || MATTEO_GREETING,
+    conversational_context: contextString,
   };
-  
-  console.log('Sending payload to API:', payload);
-  
+
+  if (import.meta.env.DEV) {
+    console.log("[dev] createConversation payload:", payload);
+  }
+
   const response = await fetch("https://tavusapi.com/v2/conversations", {
     method: "POST",
     headers: {

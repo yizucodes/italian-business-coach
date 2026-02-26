@@ -162,43 +162,63 @@ export const Instructions: React.FC = () => {
       />
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
       <AnimatedTextBlockWrapper>
-        <h1 
+        {/* Heading */}
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-2xl" role="img" aria-label="Italian flag">
+            🇮🇹
+          </span>
+          <span
+            className="text-xs font-bold tracking-[0.18em] uppercase"
+            style={{ color: "#CD212A", fontFamily: "Source Code Pro, monospace" }}
+          >
+            Benvenuto
+          </span>
+        </div>
+        <h1
           className="mb-4 pt-1 text-center text-3xl sm:text-4xl lg:text-5xl font-semibold"
-          style={{
-            fontFamily: 'Source Code Pro, monospace'
-          }}
+          style={{ fontFamily: "Source Code Pro, monospace" }}
         >
-          <span className="text-white">See AI?</span>{" "}
-          <span style={{
-            color: '#9EEAFF'
-          }}>Act Natural.</span>
+          <span className="text-white">Meet </span>
+          <span style={{ color: "#8FD8A8" }}>Matteo Rossi.</span>
         </h1>
-        <p className="max-w-[650px] text-center text-base sm:text-lg text-gray-400 mb-12">
-          Have a face-to-face conversation with an AI so real, it feels human—an intelligent agent ready to listen, respond, and act across countless use cases.
+        <p className="max-w-[600px] text-center text-base sm:text-lg text-gray-300 mb-3">
+          Matteo is VP of Procurement at a Milan-based manufacturing firm. He's
+          old-school Italian — formal, relationship-driven, and quick to notice
+          when you skip the pleasantries.
+        </p>
+        <p className="max-w-[580px] text-center text-sm text-gray-400 mb-10">
+          During your call, Matteo will{" "}
+          <strong className="text-white">pause and coach you</strong> whenever
+          you breach Italian business etiquette — from rushed introductions to
+          skipping the <em>bella figura</em>.
         </p>
         <Button
           onClick={handleClick}
-          className="relative z-20 flex items-center justify-center gap-2 rounded-3xl border border-[rgba(255,255,255,0.3)] px-8 py-2 text-sm text-white transition-all duration-200 hover:text-primary mb-12 disabled:opacity-50"
+          className="relative z-20 flex items-center justify-center gap-2 rounded-3xl border border-[rgba(255,255,255,0.3)] px-8 py-2 text-sm font-semibold text-white transition-all duration-200 mb-10 disabled:opacity-50"
           disabled={isLoading}
           style={{
-            height: '48px',
-            transition: 'all 0.2s ease-in-out',
-            backgroundColor: 'rgba(0,0,0,0.3)',
+            height: "48px",
+            backgroundColor: "#008C45",
+            borderColor: "#008C45",
+            boxShadow: "0 0 20px rgba(0,140,69,0.35)",
+            transition: "all 0.2s ease-in-out",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 15px rgba(34, 197, 254, 0.5)';
+            e.currentTarget.style.boxShadow = "0 0 28px rgba(0,140,69,0.6)";
+            e.currentTarget.style.backgroundColor = "#009e4f";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = 'none';
+            e.currentTarget.style.boxShadow = "0 0 20px rgba(0,140,69,0.35)";
+            e.currentTarget.style.backgroundColor = "#008C45";
           }}
         >
           <Video className="size-5" />
-          Start Video Chat
+          Start Coaching Call
           {getUserMediaError && (
             <div className="absolute -top-1 left-0 right-0 flex items-center gap-1 text-wrap rounded-lg border bg-red-500 p-2 text-white backdrop-blur-sm">
               <AlertTriangle className="text-red size-4" />
               <p>
-                To chat with the AI, please allow microphone access. Check your
+                To chat with Matteo, please allow microphone access. Check your
                 browser settings.
               </p>
             </div>
