@@ -1,13 +1,11 @@
-'use client';
-
 import { useEffect } from "react";
 import { motion, useAnimation, useMotionValue } from "framer-motion";
+import type { TargetAndTransition } from "framer-motion";
 import { interpolate } from "flubber";
 
-// Define your SVG paths
 const paths = [
-  "M 0 0 L 100 0 L 100 100 L 0 100 Z", // Example path 1 (square)
-  "M 50 0 A 50 50 0 1 1 50 100 A 50 50 0 1 1 50 0" // Example path 2 (circle)
+  "M 0 0 L 100 0 L 100 100 L 0 100 Z",
+  "M 50 0 A 50 50 0 1 1 50 100 A 50 50 0 1 1 50 0",
 ];
 
 export const Morpher = () => {
@@ -17,52 +15,41 @@ export const Morpher = () => {
 
   useEffect(() => {
     if (!paths.length) return;
-    
+
     let isPlaying = true;
-    const interpolators = [];
-    
-    // Create interpolator for the two paths
+
     const interpolator = interpolate(paths[0], paths[1], {
       maxSegmentLength: 2,
-      single: true
+      single: true,
     });
-    interpolators.push(interpolator);
 
     const pathInterpolator = (number: number) => {
       const wrapped = number % 1;
       return d.set(interpolator(wrapped));
     };
 
-    // Start animation sequence
     async function sequence(index = 0) {
-      controls.set({ 
-        "data-d": index 
-      } as any); // Type assertion to avoid the error
+      if (!isPlaying) return;
+
+      // framer-motion animates arbitrary data-* attrs to drive bound MotionValues
+      controls.set({ "data-d": index } as unknown as TargetAndTransition);
       await controls.start({
         "data-d": index + 1,
-        transition: {
-          duration: 0.8,
-          ease: "easeInOut"
-        }
-      } as any); // Type assertion to avoid the error
-      
-      // Add delay between morphs
-      await controls.start({
-        x: 0,
-        transition: { duration: 1 }
-      });
+        transition: { duration: 0.8, ease: "easeInOut" },
+      } as unknown as TargetAndTransition);
+
+      await controls.start({ x: 0, transition: { duration: 1 } });
 
       if (isPlaying) sequence(index === 0 ? 1 : 0);
     }
 
-    // Initialize and start animation
     d.set(paths[0]);
-    const removeOnChange = dShadow.onChange(pathInterpolator);
+    const removeOnChange = dShadow.on("change", pathInterpolator);
     sequence();
 
     return () => {
       isPlaying = false;
-      removeOnChange?.();
+      removeOnChange();
       controls.stop();
     };
   }, []);
@@ -85,4 +72,4 @@ export const Morpher = () => {
       </svg>
     </div>
   );
-}; 
+};
