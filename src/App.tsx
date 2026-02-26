@@ -11,6 +11,7 @@ import {
   Conversation,
   FinalScreen,
   Settings,
+  Summary,
 } from "./screens";
 
 function App() {
@@ -34,13 +35,15 @@ function App() {
         return <Conversation />;
       case "finalScreen":
         return <FinalScreen />;
+      case "summary":
+        return <Summary />;
       default:
         return <IntroLoading />;
     }
   };
 
   return (
-    <main className="flex h-svh flex-col items-center justify-between gap-3 p-5 sm:gap-4 lg:p-8 bg-black">
+    <main className="flex h-svh flex-col items-center justify-between gap-3 p-5 sm:gap-4 lg:p-8 bg-background">
       {currentScreen !== "introLoading" && <Header />}
       {renderScreen()}
       {currentScreen !== "introLoading" && <Footer />}
