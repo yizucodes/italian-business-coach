@@ -20,7 +20,8 @@ interface ScreenState {
 }
 
 const initialScreenState: ScreenState = {
-  currentScreen: "summary",
+  currentScreen: "introLoading",
 };
 
+/** Tracks which screen is currently rendered by App.tsx. */
 export const screenAtom = atom<ScreenState>(initialScreenState);

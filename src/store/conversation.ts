@@ -1,8 +1,5 @@
 import { atom } from "jotai";
 import { IConversation } from "../types";
 
-const initialConversationState: IConversation | null = null;
-
-export const conversationAtom = atom<IConversation | null>(
-  initialConversationState,
-);
+/** Active Tavus conversation object; null when no session is in progress. */
+export const conversationAtom = atom<IConversation | null>(null);
