@@ -24,3 +24,17 @@ export type SummaryScore = {
   score: number;
   evidence: string;
 };
+
+export interface ScoreCategory {
+  key: string;
+  label: string;
+  icon: string;
+  color: string;
+  keywords: string[];
+}
+
+export interface ScoreResult {
+  category: ScoreCategory;
+  score: number;
+  evidence: string;
+}

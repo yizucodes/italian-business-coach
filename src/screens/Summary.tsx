@@ -5,19 +5,12 @@ import { screenAtom } from "@/store/screens";
 import { coachingEventsAtom } from "@/store/coaching";
 import { summaryScoresAtom } from "@/store/summary";
 import { AnimatedWrapper } from "@/components/DialogWrapper";
-import type { CoachingEvent } from "@/types";
+import { ScoreCard } from "@/components/ScoreCard";
+import type { CoachingEvent, ScoreCategory, ScoreResult } from "@/types";
 
 // ── Category definitions ─────────────────────────────────────────────────────
 
-interface Category {
-  key: string;
-  label: string;
-  icon: string;
-  color: string;
-  keywords: string[];
-}
-
-const CATEGORIES: Category[] = [
+const CATEGORIES: ScoreCategory[] = [
   {
     key: "rapport",
     label: "Rapport Building",
@@ -84,13 +77,10 @@ const CATEGORIES: Category[] = [
 
 // ── Score computation ────────────────────────────────────────────────────────
 
-interface ScoreResult {
-  category: Category;
-  score: number;
-  evidence: string;
-}
-
-function matchesCategory(event: CoachingEvent, category: Category): boolean {
+function matchesCategory(
+  event: CoachingEvent,
+  category: ScoreCategory,
+): boolean {
   const haystack = `${event.issueType} ${event.explanation}`.toLowerCase();
   return category.keywords.some((kw) => haystack.includes(kw));
 }
@@ -99,8 +89,8 @@ function computeScores(events: CoachingEvent[]): ScoreResult[] {
   return CATEGORIES.map((category) => {
     const matching = events.filter((e) => matchesCategory(e, category));
 
-    // Heuristic: start at 8, subtract 1 per matching event, clamp 0–10.
-    const score = Math.max(0, Math.min(10, 8 - matching.length));
+    // Heuristic: start at 10, subtract 1 per matching event, clamp 0–10.
+    const score = Math.max(0, Math.min(10, 10 - matching.length));
     const latestMatch = matching[matching.length - 1];
     const evidence = latestMatch
       ? latestMatch.explanation
@@ -109,109 +99,6 @@ function computeScores(events: CoachingEvent[]): ScoreResult[] {
     return { category, score, evidence };
   });
 }
-
-// ── Animated score ring (SVG) ────────────────────────────────────────────────
-
-const ScoreRing: React.FC<{ score: number; color: string }> = ({
-  score,
-  color,
-}) => {
-  const r = 28;
-  const circumference = 2 * Math.PI * r;
-  const filled = (score / 10) * circumference;
-
-  return (
-    <svg
-      width="72"
-      height="72"
-      viewBox="0 0 72 72"
-      className="rotate-[-90deg]"
-      aria-hidden="true"
-    >
-      <circle
-        cx="36"
-        cy="36"
-        r={r}
-        fill="none"
-        stroke="rgba(255,255,255,0.08)"
-        strokeWidth="5"
-      />
-      <circle
-        cx="36"
-        cy="36"
-        r={r}
-        fill="none"
-        stroke={color}
-        strokeWidth="5"
-        strokeDasharray={`${filled} ${circumference}`}
-        strokeLinecap="round"
-        style={{
-          filter: `drop-shadow(0 0 6px ${color}80)`,
-          transition: "stroke-dasharray 1.2s ease",
-        }}
-      />
-    </svg>
-  );
-};
-
-// ── Score card ───────────────────────────────────────────────────────────────
-
-const ScoreCard: React.FC<{ result: ScoreResult; index: number }> = ({
-  result,
-  index,
-}) => {
-  const { category, score, evidence } = result;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.5,
-        delay: 0.25 + index * 0.13,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      className="relative flex flex-col gap-3 rounded-xl border border-white/10 bg-black/30 p-4 backdrop-blur-sm overflow-hidden"
-    >
-      {/* Italian tricolore left stripe */}
-      <div className="absolute left-0 inset-y-0 w-1 flex flex-col">
-        <div className="flex-1 bg-[#008C45]" />
-        <div className="flex-1 bg-white" />
-        <div className="flex-1 bg-[#CD212A]" />
-      </div>
-
-      {/* Top row: ring + label */}
-      <div className="ml-3 flex items-center gap-4">
-        {/* Animated ring with score overlay */}
-        <div className="relative shrink-0 flex items-center justify-center w-[72px] h-[72px]">
-          <ScoreRing score={score} color={category.color} />
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-xl font-bold text-white leading-none">
-              {score}
-            </span>
-            <span className="text-[9px] text-white/40 leading-none">/10</span>
-          </div>
-        </div>
-
-        {/* Category label */}
-        <div className="flex flex-col gap-0.5">
-          <span className="text-xl">{category.icon}</span>
-          <span
-            className="text-sm font-semibold text-white leading-tight"
-            style={{ fontFamily: "Source Code Pro, monospace" }}
-          >
-            {category.label}
-          </span>
-        </div>
-      </div>
-
-      {/* Evidence quote */}
-      <p className="ml-3 text-xs text-white/55 leading-relaxed border-l-2 border-white/10 pl-3 italic">
-        {evidence}
-      </p>
-    </motion.div>
-  );
-};
 
 // ── Summary screen ───────────────────────────────────────────────────────────
 
@@ -263,10 +150,7 @@ export const Summary: React.FC = () => {
           <span className="text-3xl" role="img" aria-label="Italian flag">
             🇮🇹
           </span>
-          <h1
-            className="text-xl font-bold text-white text-center"
-            style={{ fontFamily: "Source Code Pro, monospace" }}
-          >
+          <h1 className="text-xl font-bold text-white text-center font-mono">
             Coaching Debrief
           </h1>
           <p className="text-xs text-white/45 text-center max-w-xs">
@@ -299,6 +183,7 @@ export const Summary: React.FC = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.75, duration: 0.4 }}
           onClick={handlePracticeAgain}
+          aria-label="Practice again"
           className="mt-6 shrink-0 flex items-center gap-2 rounded-xl border border-[#008C45]/70 bg-[#008C45]/20 px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#008C45]/35 hover:border-[#008C45] hover:shadow-[0_0_20px_rgba(0,140,69,0.4)]"
         >
           Practice Again →
