@@ -4,7 +4,13 @@
 
 @layer base {
   :root {
-    --background: 0 0% 0%;
+    /* Italian tricolore accent palette */
+    --italian-green: #008C45;
+    --italian-white: #ffffff;
+    --italian-red: #CD212A;
+
+    /* Warm off-black background — subtle terracotta undertone */
+    --background: 20 10% 6%;
     --foreground: 240 10% 4%;
 
     --card: 0 0% 100%;
@@ -13,8 +19,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 4%;
 
-    --primary: 190 100% 50%;
-    --primary-foreground: 190 100% 95%;
+    /* Primary — Italian green */
+    --primary: 150 100% 27%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 100%;
     --secondary-foreground: 210 40% 98%;
@@ -22,8 +29,9 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 190 100% 50%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent — Italian red */
+    --accent: 357 72% 47%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -32,9 +40,10 @@
 
     --progress: 213 86% 60%;
 
-    --border: 190 100% 50%;
+    /* Border / ring — Italian green */
+    --border: 150 100% 27%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 190 100% 50%;
+    --ring: 150 100% 27%;
 
     --radius: 0.5rem;
   }
