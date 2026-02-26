@@ -1,21 +1,14 @@
 import { IConversation } from "@/types";
 import { settingsAtom } from "@/store/settings";
 import { getDefaultStore } from "jotai";
+import { PERSONA_GREETING } from "@/config";
 
-const FALLBACK_PERSONA_ID =
-  import.meta.env.VITE_PERSONA_ID ?? "pd43ffef";
-
-const MATTEO_GREETING =
-  "Benvenuto. I'm Matteo Rossi. Please, take a seat — let's talk business.";
+const FALLBACK_PERSONA_ID = import.meta.env.VITE_PERSONA_ID ?? "pd43ffef";
 
 export const createConversation = async (
   token: string,
 ): Promise<IConversation> => {
   const settings = getDefaultStore().get(settingsAtom);
-
-  if (import.meta.env.DEV) {
-    console.log("[dev] createConversation settings:", settings);
-  }
 
   let contextString = "";
   if (settings.name) {
@@ -25,13 +18,9 @@ export const createConversation = async (
 
   const payload = {
     persona_id: settings.persona || FALLBACK_PERSONA_ID,
-    custom_greeting: settings.greeting || MATTEO_GREETING,
+    custom_greeting: settings.greeting || PERSONA_GREETING,
     conversational_context: contextString,
   };
-
-  if (import.meta.env.DEV) {
-    console.log("[dev] createConversation payload:", payload);
-  }
 
   const response = await fetch("https://tavusapi.com/v2/conversations", {
     method: "POST",

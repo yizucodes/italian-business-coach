@@ -19,7 +19,6 @@ export const endConversation = async (
 
     return null;
   } catch (error) {
-    console.error("Error:", error);
     throw error;
   }
 };
