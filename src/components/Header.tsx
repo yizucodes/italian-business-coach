@@ -23,9 +23,9 @@ export const Header = memo(() => {
       <div className="flex items-center gap-3">
         {/* Italian tricolore flag bar */}
         <div className="flex h-9 w-2 flex-col overflow-hidden rounded-sm shrink-0">
-          <div className="flex-1" style={{ backgroundColor: "var(--italian-green)" }} />
+          <div className="flex-1 bg-[var(--italian-green)]" />
           <div className="flex-1 bg-white" />
-          <div className="flex-1" style={{ backgroundColor: "var(--italian-red)" }} />
+          <div className="flex-1 bg-[var(--italian-red)]" />
         </div>
 
         <div className="flex flex-col leading-none">
@@ -49,6 +49,7 @@ export const Header = memo(() => {
           variant="outline"
           size="icon"
           onClick={handleSettings}
+          aria-label="Open settings"
           className="relative size-10 sm:size-14 border-0 bg-transparent hover:bg-zinc-800"
         >
           <Settings className="size-4 sm:size-6" />

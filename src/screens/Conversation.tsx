@@ -29,7 +29,7 @@ import {
   updateSessionEndTime,
 } from "@/utils";
 import { Timer } from "@/components/Timer";
-import { TIME_LIMIT } from "@/config";
+import { TIME_LIMIT, COACHING_TOOL_NAME } from "@/config";
 import { apiTokenAtom } from "@/store/tokens";
 import { coachingEventsAtom } from "@/store/coaching";
 import { CoachingSidebar } from "@/components/CoachingSidebar";
@@ -85,7 +85,7 @@ export const Conversation: React.FC = () => {
         if (
           data?.event_type !== "conversation.tool_call" ||
           (data?.properties as Record<string, unknown>)?.name !==
-            "trigger_cultural_coaching"
+            COACHING_TOOL_NAME
         ) {
           return;
         }
@@ -274,6 +274,7 @@ export const Conversation: React.FC = () => {
             <div className="absolute bottom-8 right-1/2 z-10 flex translate-x-1/2 justify-center gap-4">
               <Button
                 size="icon"
+                aria-label={isMicEnabled ? "Mute microphone" : "Unmute microphone"}
                 className="border border-[#22C5FE] shadow-[0_0_20px_rgba(34,197,254,0.2)]"
                 variant="secondary"
                 onClick={toggleAudio}
@@ -286,6 +287,7 @@ export const Conversation: React.FC = () => {
               </Button>
               <Button
                 size="icon"
+                aria-label={isCameraEnabled ? "Turn off camera" : "Turn on camera"}
                 className="border border-[#22C5FE] shadow-[0_0_20px_rgba(34,197,254,0.2)]"
                 variant="secondary"
                 onClick={toggleVideo}
@@ -298,6 +300,7 @@ export const Conversation: React.FC = () => {
               </Button>
               <Button
                 size="icon"
+                aria-label="End conversation"
                 className="bg-[rgba(251,36,71,0.80)] backdrop-blur hover:bg-[rgba(251,36,71,0.60)] border border-[rgba(251,36,71,0.9)] shadow-[0_0_20px_rgba(251,36,71,0.3)]"
                 variant="secondary"
                 onClick={leaveConversation}

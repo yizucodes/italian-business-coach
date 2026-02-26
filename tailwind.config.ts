@@ -6,6 +6,15 @@ export default {
   theme: {
     fontFamily: {
       inter: ["Inter", "sans-serif"],
+      mono: [
+        "Source Code Pro",
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "Monaco",
+        "Consolas",
+        "monospace",
+      ],
     },
     extend: {
       backgroundImage: {
