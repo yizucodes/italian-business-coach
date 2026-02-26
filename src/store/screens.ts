@@ -12,14 +12,15 @@ export type Screen =
   | "positiveFeedback"
   | "negativeFeedback"
   | "finalScreen"
-  | "sessionEnded";
+  | "sessionEnded"
+  | "summary";
 
 interface ScreenState {
   currentScreen: Screen;
 }
 
 const initialScreenState: ScreenState = {
-  currentScreen: "introLoading",
+  currentScreen: "summary",
 };
 
 export const screenAtom = atom<ScreenState>(initialScreenState);

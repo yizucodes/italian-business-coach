@@ -11,3 +11,16 @@ export type IConversation = {
   conversation_url: string;
   created_at: string;
 };
+
+export type CoachingEvent = {
+  id: string;
+  issueType: string;
+  explanation: string;
+  timestamp: number;
+};
+
+export type SummaryScore = {
+  category: string;
+  score: number;
+  evidence: string;
+};
