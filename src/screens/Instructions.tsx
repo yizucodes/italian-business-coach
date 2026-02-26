@@ -176,17 +176,6 @@ export const Instructions: React.FC = () => {
             Camera access is required
           </div>
         </div>
-        <span className="absolute bottom-6 px-4 text-sm text-gray-500 sm:bottom-8 sm:px-8 text-center">
-          By starting a conversation, I accept the{" "}
-          <a href="#" className="text-primary hover:underline">
-            Terms of Use
-          </a>{" "}
-          and acknowledge the{" "}
-          <a href="#" className="text-primary hover:underline">
-            Privacy Policy
-          </a>
-          .
-        </span>
       </AnimatedTextBlockWrapper>
     </DialogWrapper>
   );
