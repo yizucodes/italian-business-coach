@@ -122,8 +122,7 @@ Add a tool named `trigger_cultural_coaching` with the following JSON schema:
 
 ### Recommended Tavus Settings
 
-<div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start;">
-
+<div style="display: flex; gap: 24px; align-items: flex-start;">
 <table>
 <tr><th>Setting</th><th>Value</th></tr>
 <tr><td><strong>LLM</strong></td><td><code>tavus-gpt-5.2</code></td></tr>
@@ -135,9 +134,7 @@ Add a tool named `trigger_cultural_coaching` with the following JSON schema:
 <tr><td><strong>TTS External Voice ID for Italian accent (optional)</strong></td><td><code>e5923af7-a329-4e9b-b95a-5ace4a083535</code></td></tr>
 <tr><td><strong>Emotion Control</strong></td><td>Yes</td></tr>
 </table>
-
 <img width="468" height="1194" alt="Tavus persona config" src="https://github.com/user-attachments/assets/b6fbeffb-8ff2-4ab9-830b-dc6fa8ed4e4d" />
-
 </div>
 
 ---
