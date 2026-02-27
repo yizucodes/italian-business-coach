@@ -1,6 +1,14 @@
 # 🇮🇹 Benvenuto — Italian Business Coach
 
-An AI-powered business-culture coaching experience built on [Tavus CVI](https://tavus.io). You play an American sales executive preparing to close a deal in Milan. Your AI counterpart, **Matteo Rossi** (VP of Procurement), conducts the meeting in real time — and coaches you whenever you breach Italian business etiquette.
+
+
+An AI-powered business-culture coaching experience built on [Tavus CVI](https://tavus.io). This project demonstrates **persona tool-call integration**, **real-time client-side event handling**, and **structured LLM evaluation** in a single end-to-end session.
+
+You play an American sales executive preparing to close a deal in Milan. Your AI counterpart, **Matteo Rossi** (VP of Procurement), conducts the meeting in real time — and coaches you whenever you breach Italian business etiquette.
+
+**[📹 Watch the demo](https://youtu.be/WNV8BCi8bRo?si=-Qhp-7-jKJwlj-4K) · [🔍 Try it live](https://italian-business-coach.vercel.app/)**
+
+<img width="1065" height="659" alt="Benvenuto conversation screen" src="https://github.com/user-attachments/assets/362bd0ab-416a-40a8-96c9-55450a5f7701" />
 
 ---
 
@@ -18,6 +26,10 @@ An AI-powered business-culture coaching experience built on [Tavus CVI](https://
 
 ## Quick Start
 
+> **No setup required to evaluate the core experience** — the [live deployment](https://italian-business-coach.vercel.app/) is pre-configured with a shared Tavus API key and a ready-made Matteo persona. Enter your own key on the intro screen only if you want to run against your own account.
+
+To run locally:
+
 ### 1. Install dependencies
 
 ```bash
@@ -26,7 +38,7 @@ npm install
 
 ### 2. Configure credentials
 
-Copy `.env.local.example` (or create `.env.local` yourself) and fill in your values:
+Create `.env.local` and fill in your values:
 
 ```bash
 # .env.local
@@ -37,8 +49,10 @@ VITE_OPENAI_API_KEY=
 ```
 
 - **`VITE_TAVUS_API_KEY`** — Your Tavus API key. Create one at [platform.tavus.io/api-keys](https://platform.tavus.io/api-keys).
-- **`VITE_PERSONA_ID`** — The ID of the Matteo Rossi persona. Create or copy a persona at [platform.tavus.io/personas](https://platform.tavus.io/personas). When set, the persona must have the `trigger_cultural_coaching` tool configured (see [Tool-Call Integration](#tool-call-integration) below).
-- **`VITE_OPENAI_API_KEY`** *(optional)* — Used for AI-powered debrief scoring (enhanced feedback). If unset, the app falls back to keyword-based scoring.
+- **`VITE_PERSONA_ID`** — The ID of the Matteo Rossi persona. Create or copy a persona at [platform.tavus.io/personas](https://platform.tavus.io/personas). The persona must have the `trigger_cultural_coaching` tool configured (see [Tool-Call Integration](#tool-call-integration) below).
+- **`VITE_OPENAI_API_KEY`** *(optional)* — Used for AI-powered debrief scoring. If unset, the app falls back to keyword-based scoring automatically.
+
+> ⚠️ **Security note:** `VITE_*` env vars are embedded in the client bundle at build time. This is intentional for a demo context. In production, API calls would be proxied through a backend service so the key is never shipped to the client.
 
 When `VITE_TAVUS_API_KEY` is set, the intro screen's API key field auto-fills so you can click straight through.
 
@@ -48,7 +62,7 @@ When `VITE_TAVUS_API_KEY` is set, the intro screen's API key field auto-fills so
 npm run dev
 ```
 
-Navigate to `http://localhost:5173`.
+Navigate to `http://localhost:5173`
 
 ---
 
@@ -285,9 +299,15 @@ If a scoring dimension produced zero relevant coaching events — for example be
 
 ---
 
-## Security Note
+## What I'd Build Next
 
-> ⚠️ This is a **development template**. The Tavus API key is read from `VITE_*` env vars, which are embedded in the client bundle at build time. For production, proxy API calls through a backend service and never ship the key in client code.
+Given more time, the highest-value additions would be:
+
+- **Server-side API proxy** — move the Tavus and OpenAI calls to an edge function (e.g. Vercel Functions) so credentials are never in the client bundle. This is the single most important production gap.
+- **Conversation transcript access** — Tavus exposes a transcript endpoint post-call; feeding the full transcript to the judge (alongside coaching events) would allow it to credit positive behaviour, not just penalise missteps.
+- **Additional cultural scenarios** — the three-phase script is hardcoded into the persona. A scenario selector (Japan, Germany, Brazil) with swappable system prompts would turn this into a reusable training platform.
+- **Persistent session history** — storing past sessions in localStorage or a lightweight backend would let users track improvement across multiple practice runs.
+- **Richer coaching UI** — timestamping each coaching event against the call duration would let users replay specific moments in the post-call debrief.
 
 ---
 
