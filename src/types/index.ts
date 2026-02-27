@@ -23,6 +23,8 @@ export type SummaryScore = {
   category: string;
   score: number;
   evidence: string;
+  /** True when the score was produced by the LLM judge; false/absent for keyword-based scores. */
+  aiGenerated?: boolean;
 };
 
 export interface ScoreCategory {
@@ -37,4 +39,18 @@ export interface ScoreResult {
   category: ScoreCategory;
   score: number;
   evidence: string;
+}
+
+export interface JudgeResult {
+  scores: {
+    rapport: number;
+    energy: number;
+    negotiation: number;
+  };
+  feedback: {
+    rapport: string;
+    energy: string;
+    negotiation: string;
+  };
+  overall?: string;
 }
