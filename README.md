@@ -1,8 +1,8 @@
 # 🇮🇹 Benvenuto — Italian Business Coach
 
+Growing up in Italy and studying business gave me a front-row seat to how cultural misfires silently kill cross-border deals in the first 60 seconds; I built Benvenuto to give outsiders the insider's advantage.
 
-
-An AI-powered business-culture coaching experience built on [Tavus CVI](https://tavus.io). This project demonstrates **persona tool-call integration**, **real-time client-side event handling**, and **structured LLM evaluation** in a single end-to-end session.
+Benvenuto is an AI-powered business-culture coaching experience built on [Tavus CVI](https://tavus.io). This project demonstrates **persona tool-call integration**, **real-time client-side event handling**, and **structured LLM evaluation** in a single end-to-end session.
 
 You play an American sales executive preparing to close a deal in Milan. Your AI counterpart, **Matteo Rossi** (VP of Procurement), conducts the meeting in real time — and coaches you whenever you breach Italian business etiquette.
 
