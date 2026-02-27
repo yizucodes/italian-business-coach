@@ -319,3 +319,5 @@ Given more time, the highest-value additions would be:
 - [react-hot-toast](https://react-hot-toast.com) — coaching toasts
 - [@daily-co/daily-react](https://docs.daily.co/reference/daily-react) — WebRTC video
 - [Tavus CVI](https://tavus.io) — conversational AI video persona
+
+Scaffolded from [tavus-vibecode-quickstart](https://github.com/Tavus-Engineering/tavus-vibecode-quickstart); all application logic, persona design, and architecture are original.
