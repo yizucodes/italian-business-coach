@@ -82,6 +82,9 @@ src/
     └── index.ts                 # CoachingEvent, SummaryScore, IConversation
 ```
 
+<img width="1065" height="659" alt="image" src="https://github.com/user-attachments/assets/362bd0ab-416a-40a8-96c9-55450a5f7701" />
+
+
 ---
 
 ## Tool-Call Integration
