@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useAtom } from "jotai";
 import { motion } from "framer-motion";
 import { screenAtom } from "@/store/screens";
@@ -6,7 +6,8 @@ import { coachingEventsAtom } from "@/store/coaching";
 import { summaryScoresAtom } from "@/store/summary";
 import { AnimatedWrapper } from "@/components/DialogWrapper";
 import { ScoreCard } from "@/components/ScoreCard";
-import type { CoachingEvent, ScoreCategory, ScoreResult } from "@/types";
+import { runDebriefJudge } from "@/api/debriefJudge";
+import type { CoachingEvent, JudgeResult, ScoreCategory, ScoreResult } from "@/types";
 
 // ── Category definitions ─────────────────────────────────────────────────────
 
@@ -33,7 +34,7 @@ const CATEGORIES: ScoreCategory[] = [
   },
   {
     key: "energy",
-    label: "Energy & Enthusiasm",
+    label: "Energy & Tone",
     icon: "⚡",
     color: "#E8A427",
     keywords: [
@@ -53,7 +54,7 @@ const CATEGORIES: ScoreCategory[] = [
   },
   {
     key: "negotiation",
-    label: "Negotiation Directness",
+    label: "Negotiation Pace",
     icon: "📊",
     color: "#CD212A",
     keywords: [
@@ -107,18 +108,77 @@ export const Summary: React.FC = () => {
   const [events, setEvents] = useAtom(coachingEventsAtom);
   const [, setScores] = useAtom(summaryScoresAtom);
 
-  const results = useMemo(() => computeScores(events), [events]);
+  // Initialise with keyword scores so the UI is never empty
+  const [results, setResults] = useState<ScoreResult[]>(() =>
+    computeScores(events),
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [judgeError, setJudgeError] = useState<string | null>(null);
+  // Tracks whether the displayed results came from the LLM judge
+  const [aiGenerated, setAiGenerated] = useState(false);
 
-  /** Sync computed scores to summaryScoresAtom so it stays the source of truth */
+  // ── AI judge — runs once on mount ────────────────────────────────────────
   useEffect(() => {
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+
+    if (!apiKey) {
+      setJudgeError(
+        "Summary based on coaching events. For AI-powered feedback, set VITE_OPENAI_API_KEY.",
+      );
+      return;
+    }
+
+    let cancelled = false;
+    setIsLoading(true);
+
+    // Enforce a minimum 500 ms loading window so it never flashes
+    const minDelay = new Promise<void>((r) => setTimeout(r, 500));
+
+    Promise.all([runDebriefJudge(events), minDelay])
+      .then(([judgeResult]) => {
+        if (cancelled) return;
+        const aiResults: ScoreResult[] = CATEGORIES.map((cat) => ({
+          category: cat,
+          score: judgeResult.scores[cat.key as keyof JudgeResult["scores"]],
+          evidence:
+            judgeResult.feedback[cat.key as keyof JudgeResult["feedback"]],
+        }));
+        setResults(aiResults);
+        setAiGenerated(true);
+        setIsLoading(false);
+      })
+      .catch(async (err: unknown) => {
+        if (cancelled) return;
+        if (import.meta.env.DEV) {
+          console.error("[DebriefJudge]", err);
+        }
+        // Wait out any remaining minimum delay before swapping in fallback scores
+        await minDelay;
+        if (cancelled) return;
+        setResults(computeScores(events));
+        setAiGenerated(false);
+        setJudgeError("AI scoring failed — showing keyword-based scores.");
+        setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Sync scores to atom once loading is complete ─────────────────────────
+  useEffect(() => {
+    if (isLoading) return;
     setScores(
       results.map((r) => ({
         category: r.category.label,
         score: r.score,
         evidence: r.evidence,
+        aiGenerated,
       })),
     );
-  }, [results, setScores]);
+  }, [results, isLoading, aiGenerated, setScores]);
 
   const overallScore = Math.round(
     results.reduce((sum, r) => sum + r.score, 0) / results.length,
@@ -165,17 +225,32 @@ export const Summary: React.FC = () => {
               Overall
             </span>
             <span className="text-base font-bold text-white">
-              {overallScore}/10
+              {isLoading ? "…" : `${overallScore}/10`}
             </span>
           </div>
         </motion.div>
 
-        {/* ── Score cards ── */}
+        {/* ── Score cards / loading skeleton ── */}
         <div className="flex flex-col gap-3 w-full max-w-md">
-          {results.map((result, i) => (
-            <ScoreCard key={result.category.key} result={result} index={i} />
-          ))}
+          {isLoading
+            ? CATEGORIES.map((cat) => (
+                <div
+                  key={cat.key}
+                  className="animate-pulse rounded-2xl border border-white/10 bg-white/5 h-24"
+                  aria-label={`Loading ${cat.label} score`}
+                />
+              ))
+            : results.map((result, i) => (
+                <ScoreCard key={result.category.key} result={result} index={i} />
+              ))}
         </div>
+
+        {/* ── Fallback / error banner ── */}
+        {!isLoading && judgeError && (
+          <p className="mt-4 text-xs text-white/40 text-center max-w-xs">
+            {judgeError}
+          </p>
+        )}
 
         {/* ── Practice Again CTA ── */}
         <motion.button

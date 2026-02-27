@@ -1,55 +1,172 @@
-# Tavus Vibecode Quickstart
+# 🇮🇹 Benvenuto — Italian Business Coach
 
-## 🚀 Introduction
+An AI-powered business-culture coaching experience built on [Tavus CVI](https://tavus.io). You play an American sales executive preparing to close a deal in Milan. Your AI counterpart, **Matteo Rossi** (VP of Procurement), conducts the meeting in real time — and coaches you whenever you breach Italian business etiquette.
 
-The fastest way to get started vibecoding with Tavus CVI. This React quickstart template provides everything you need to create interactive video experiences powered by Tavus's Conversational Video Interface technology.
+---
 
-> ⚠️ **Important Note**: This is a development template only. For production use, you must:
-> - Never expose your Tavus API keys in the frontend
-> - Implement a secure backend service to handle API calls
-> - Use environment variables and proper key management
-> - Follow security best practices for handling sensitive credentials
+## What It Does
 
-<br></br>
-## 🛠️ Tech Stack
-- React
-- TypeScript
-- Vite
-- Tailwind CSS
-- Framer Motion
-<br></br>
-## 🧑‍💻 Try it Live
-Spin up this template in under a minute with StackBlitz:
+| Feature | Detail |
+|---|---|
+| **Live AI conversation** | Video call with the Matteo Rossi persona powered by Tavus CVI |
+| **Real-time coaching** | Toast notifications fire whenever Matteo's persona triggers the `trigger_cultural_coaching` tool call |
+| **Coaching sidebar** | Accumulated coaching notes are displayed in a scrollable panel beside the video |
+| **Post-call debrief** | After the call, a summary screen scores you across three categories with evidence quotes |
+| **Practice Again** | One click resets all state and returns you to the intro |
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/Tavus-Engineering/tavus-vibecode-quickstart?file=src%2FApp.tsx)
+---
 
-<br></br>
-## ⚡ Quick Start
+## Quick Start
 
-1. **Get your API credentials:**
-   - Create an account on [Tavus Platform](https://platform.tavus.io/api-keys)
-   - Generate your API token
+### 1. Install dependencies
 
-2. **Run the template:**
-   ```bash
-   npm install
-   npm run dev
+```bash
+npm install
+```
+
+### 2. Configure credentials
+
+Copy `.env.local.example` (or create `.env.local` yourself) and fill in your values:
+
+```bash
+# .env.local
+VITE_TAVUS_API_KEY=your_tavus_api_key_here
+VITE_PERSONA_ID=your_matteo_persona_id_here
+# Optional: for AI-powered debrief scoring
+VITE_OPENAI_API_KEY=
+```
+
+- **`VITE_TAVUS_API_KEY`** — Your Tavus API key. Create one at [platform.tavus.io/api-keys](https://platform.tavus.io/api-keys).
+- **`VITE_PERSONA_ID`** — The ID of the Matteo Rossi persona. Create or copy a persona at [platform.tavus.io/personas](https://platform.tavus.io/personas). When set, the persona must have the `trigger_cultural_coaching` tool configured (see [Tool-Call Integration](#tool-call-integration) below).
+- **`VITE_OPENAI_API_KEY`** *(optional)* — Used for AI-powered debrief scoring (enhanced feedback). If unset, the app falls back to keyword-based scoring.
+
+When `VITE_TAVUS_API_KEY` is set, the intro screen's API key field auto-fills so you can click straight through.
+
+### 3. Run the dev server
+
+```bash
+npm run dev
+```
+
+Navigate to `http://localhost:5173`.
+
+---
+
+## Architecture Overview
+
+```
+src/
+├── api/
+│   ├── createConversation.ts   # POST /v2/conversations — uses persona ID from config
+│   ├── endConversation.ts      # DELETE /v2/conversations/:id
+│   └── debriefJudge.ts         # LLM-as-judge: scores coaching events via gpt-4o-mini
+├── config/
+│   └── index.ts                # Centralised branding + palette constants
+├── components/
+│   ├── CoachingCard.tsx         # Single coaching event card (issue type + explanation)
+│   ├── CoachingSidebar.tsx      # Scrollable list of CoachingCards
+│   ├── Header.tsx               # Benvenuto brand mark + settings gear
+│   └── Footer.tsx               # "Powered by Tavus CVI" attribution
+├── screens/
+│   ├── Intro.tsx                # Scenario briefing + API key entry
+│   ├── Instructions.tsx         # Matteo briefing + mic/camera permissions
+│   ├── Conversation.tsx         # Two-panel video call + coaching sidebar
+│   ├── Summary.tsx              # Post-call debrief with scored categories
+│   └── FinalScreen.tsx          # Fallback end-call screen (not in primary flow)
+├── store/
+│   ├── coaching.ts              # coachingEventsAtom — accumulated CoachingEvents
+│   ├── summary.ts               # summaryScoresAtom — computed SummaryScores
+│   ├── tokens.ts                # apiTokenAtom (seeded from env var or localStorage)
+│   └── screens.ts               # screenAtom — current screen union type
+└── types/
+    └── index.ts                 # CoachingEvent, SummaryScore, IConversation
+```
+
+---
+
+## Tool-Call Integration
+
+Tavus CVI supports **server-side tool calls** — the persona can trigger a named function during the conversation. Benvenuto uses this to deliver real-time coaching.
+
+### How it works
+
+1. The Matteo Rossi persona is configured on the Tavus platform with a tool named `trigger_cultural_coaching`.
+2. During a call, when Matteo detects a cultural misstep, his LLM emits a tool call with arguments:
+   ```json
+   {
+     "issue_type": "Greeting Etiquette",
+     "explanation": "In Italian business culture, always greet with 'Buongiorno' and use titles..."
+   }
    ```
+3. Tavus forwards this as a Daily `app-message` event with `event_type: "conversation.tool_call"`.
+4. `Conversation.tsx` listens via `useDailyEvent("app-message", handler)`, validates the tool name, parses the arguments, and:
+   - Appends a `CoachingEvent` to `coachingEventsAtom`.
+   - Fires a `react-hot-toast` notification in the bottom-left corner.
+5. The `CoachingSidebar` re-renders automatically from `coachingEventsAtom`.
 
-3. **Customize your persona:**
-   - Update the `persona_id` in `createConversation.ts` with your own
-   - Learn how to [create your own persona](https://docs.tavus.io/sections/conversational-video-interface/creating-a-persona) on the [Tavus Platform](https://platform.tavus.io/)
+### Testing without a live persona
 
-   ```typescript
-   body: JSON.stringify({
-     persona_id: "your_persona_id_here",
-   }),
-   ```
+Open the browser console during a call and dispatch a fake app-message:
 
-<br></br>
-## 📚 Resources
+```js
+window.__daily.sendAppMessage({
+  event_type: "conversation.tool_call",
+  properties: {
+    name: "trigger_cultural_coaching",
+    arguments: JSON.stringify({
+      issue_type: "Greeting Etiquette",
+      explanation: "Always open with a formal 'Buongiorno, Dottore.' before any business talk."
+    })
+  }
+})
+```
 
-- [Tavus Documentation](https://docs.tavus.io/)
-- [API Reference](https://docs.tavus.io/api-reference/)
-- [Tavus Platform](https://platform.tavus.io/)
-- [Daily React Reference](https://docs.daily.co/reference/daily-react)
+---
+
+## Summary Scoring
+
+After the call, the summary screen scores you across three categories:
+
+| Category | What it measures |
+|---|---|
+| **Rapport Building** | Warmth, relationship-first approach, proper use of titles, small talk |
+| **Energy & Tone** | Expressiveness, enthusiasm, vocal variety |
+| **Negotiation Pace** | Patience, avoiding rushed or high-pressure closings |
+
+When `VITE_OPENAI_API_KEY` is set, scores and one-sentence feedback are produced by an LLM judge (see [AI-Powered Debrief](#ai-powered-debrief) below). Without the key, a keyword heuristic is used instead: each category starts at 10 and loses 1 point per matching coaching event, clamped between 0 and 10.
+
+---
+
+## AI-Powered Debrief
+
+When `VITE_OPENAI_API_KEY` is present, the post-call summary uses an **LLM-as-judge** approach instead of keyword matching.
+
+| Detail | Value |
+|---|---|
+| **Model** | `gpt-4o-mini` (cost-efficient, fast) |
+| **Input** | All `CoachingEvent` records from the session (`issueType` + `explanation`) |
+| **Output** | Integer scores 0–10 and a qualitative feedback sentence per category, plus an optional overall summary sentence |
+| **Optional** | Yes — the app works without the key; keyword scoring is the fallback |
+
+**Fallback behaviour:** if the key is missing or the API call fails, `computeScores` (keyword heuristic) runs automatically and a small banner informs the user that AI scoring was unavailable. No error is ever surfaced raw to the user.
+
+Implementation: [`src/api/debriefJudge.ts`](src/api/debriefJudge.ts)
+
+---
+
+## Security Note
+
+> ⚠️ This is a **development template**. The Tavus API key is read from `VITE_*` env vars, which are embedded in the client bundle at build time. For production, proxy API calls through a backend service and never ship the key in client code.
+
+---
+
+## Tech Stack
+
+- [React 18](https://react.dev) + [TypeScript](https://www.typescriptlang.org)
+- [Vite](https://vitejs.dev)
+- [Tailwind CSS v4](https://tailwindcss.com)
+- [Jotai](https://jotai.org) — atomic state management
+- [Framer Motion](https://www.framer.com/motion/) — screen animations
+- [react-hot-toast](https://react-hot-toast.com) — coaching toasts
+- [@daily-co/daily-react](https://docs.daily.co/reference/daily-react) — WebRTC video
+- [Tavus CVI](https://tavus.io) — conversational AI video persona
