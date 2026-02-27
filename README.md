@@ -154,6 +154,49 @@ Implementation: [`src/api/debriefJudge.ts`](src/api/debriefJudge.ts)
 
 ---
 
+## Design Decisions
+
+### LLM as judge for post-call scoring
+
+The initial scoring approach used keyword matching: each category had a list of trigger words, the app scanned the free-text coaching explanations for matches, and deducted one point per hit. This produced several concrete problems:
+
+- **Cross-category bleeding** — a single event like "rushed introduction" matched keywords in both Rapport and Negotiation, applying a double penalty for one misstep.
+- **False positives** — instructive language ("you should be more formal") triggered the same keywords as actual infractions.
+- **No positive signal** — the model could only penalise; it could never credit warmth, patience, or expressiveness the user demonstrated.
+- **Misleading "perfect" scores** — if a category was never reached in a short call, the user saw 10/10, which reads as excellence rather than "not evaluated."
+
+An LLM judge resolves all of these: it infers intent and context from the event list, can acknowledge what went well, and can explicitly flag dimensions that were not exercised in the session.
+
+### Coaching events as judge input — not the full transcript
+
+The judge receives only the structured `{ issueType, explanation }` pairs that Matteo's persona emitted during the call, not the raw conversation transcript. This is intentional: the persona's LLM already did the work of detecting cultural missteps and encoding them into a structured intermediate representation. Feeding that to a second model avoids redundant reanalysis, keeps the payload small, and means no raw conversation text is sent to an external API.
+
+### The three scoring dimensions
+
+The categories are grounded in specific Italian business culture norms rather than generic sales metrics:
+
+| Dimension | Cultural basis |
+|---|---|
+| **Rapport Building** | Italian business is relationship-first (*la fiducia*) — warmth, titles, and small talk precede any deal discussion |
+| **Energy & Tone** | *Bella figura* (good impression) demands expressiveness and presence; a flat or monotone delivery signals disrespect |
+| **Negotiation Pace** | *Non si fa in fretta* — deals are not rushed; high-pressure closings are a serious cultural misstep |
+
+"Bella figura" was considered as a dimension name but rejected: it is too broad to score honestly against a set of coaching events. "Energy & Tone" is a more precise, measurable proxy for the same underlying norm.
+
+### "Not tested" scores 7, not 10
+
+If a scoring dimension produced zero relevant coaching events — for example because the call ended before any negotiation — the judge is instructed to return 7 and note in the feedback that the dimension was not evaluated. Returning 10 would be misleading: it implies the user performed perfectly when the call simply never reached that scenario.
+
+### Optional OpenAI key with graceful fallback
+
+`VITE_OPENAI_API_KEY` is optional. If it is absent or the API call fails, the app falls back to the keyword heuristic automatically and surfaces a short banner to the user. This ensures the debrief screen is always functional regardless of whether an evaluator has configured the key, while still showcasing the richer LLM-powered experience when it is available.
+
+### Judge temperature and model
+
+`temperature: 0.3` is used deliberately. A scoring judge should produce consistent, analytical output across similar inputs — low temperature reduces creative variance without eliminating the model's ability to synthesise qualitative feedback. `gpt-4o-mini` was chosen for cost and latency: the judge runs once per session on a small payload, so a frontier model would add cost without meaningful quality gain.
+
+---
+
 ## Security Note
 
 > ⚠️ This is a **development template**. The Tavus API key is read from `VITE_*` env vars, which are embedded in the client bundle at build time. For production, proxy API calls through a backend service and never ship the key in client code.
