@@ -11,7 +11,6 @@ import {
   Instructions,
   Conversation,
   FinalScreen,
-  Settings,
   Summary,
 } from "./screens";
 
@@ -28,8 +27,6 @@ function App() {
         return <OutOfMinutes />;
       case "intro":
         return <Intro />;
-      case "settings":
-        return <Settings />;
       case "instructions":
         return <Instructions />;
       case "conversation":

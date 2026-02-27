@@ -6,7 +6,6 @@ export type Screen =
   | "outOfMinutes"
   | "intro"
   | "instructions"
-  | "settings"
   | "conversation"
   | "conversationError"
   | "positiveFeedback"
