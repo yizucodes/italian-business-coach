@@ -8,8 +8,6 @@ You play an American sales executive preparing to close a deal in Milan. Your AI
 
 **[📹 Watch the demo](https://youtu.be/WNV8BCi8bRo?si=-Qhp-7-jKJwlj-4K) · [🔍 Try it live](https://italian-business-coach.vercel.app/)**
 
-<img width="1065" height="659" alt="Benvenuto conversation screen" src="https://github.com/user-attachments/assets/362bd0ab-416a-40a8-96c9-55450a5f7701" />
-
 ---
 
 ## What It Does
